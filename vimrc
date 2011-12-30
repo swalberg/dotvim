@@ -14,7 +14,9 @@ set tabstop=2
 set shiftwidth=2
 set expandtab
 set autoindent
+set ruler
 :colorscheme zenburn
+syntax on
 
 :set autowrite
 cmap <F4> !xmlwf < %
@@ -26,4 +28,8 @@ ab imagecode <figure><heading refname="figure1" type="figure" alttoc="">Figure 
 ab sidebarcode <sidebar width=""><heading refname="" type="sidebar">SIDEBAR</heading></sidebar>
 ab tablecode       <heading refname="table1" type="table">Table 1. Table using a heading tag for the caption, all columns left-aligned (recommended style)</heading> <table border="0" cellpadding="0" cellspacing="0" class="data-table-1" width="100%" summary="Table using a heading tag for the caption, all columns left-aligned">
 
-
+runtime macros/matchit.vim
+set nocompatible
+if has("autocmd")
+  filetype indent plugin on
+  endif
