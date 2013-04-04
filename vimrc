@@ -5,9 +5,37 @@
 " Needed on some linux distros.
 " see http://www.adamlowe.me/2009/12/vim-destroys-all-other-rails-editors.html
 filetype off 
-call pathogen#helptags()
-call pathogen#runtime_append_all_bundles()
 
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+" let Vundle manage Vundle
+" required! 
+Bundle 'gmarik/vundle'
+"
+" Brief help
+" :BundleList          - list configured bundles
+" :BundleInstall(!)    - install(update) bundles
+" :BundleSearch(!) foo - search(or refresh cache first) for foo
+" :BundleClean(!)      - confirm(or auto-approve) removal of unused bundles
+"
+" see :h vundle for more details or wiki for FAQ
+" NOTE: comments after Bundle command are not allowed..
+
+
+" original repos on github
+Bundle 'tpope/vim-fugitive'
+Bundle 'tpope/vim-git'
+Bundle 'tpope/vim-haml'
+Bundle 'tpope/vim-markdown'
+Bundle 'tpope/vim-rails'
+" Bundle 'tpope/vim-vividchalk'
+" Bundle 'tsaleh/vim-align'
+" Bundle 'tsaleh/vim-shoulda'
+" Bundle 'tsaleh/vim-supertab'
+Bundle 'vim-ruby/vim-ruby'
+Bundle 'kana/vim-textobj-user'
+Bundle 'nelstrom/vim-textobj-rubyblock'
 
 set t_Co=256
 set tabstop=2
@@ -54,15 +82,21 @@ endif
 " Test-running stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! RunCurrentTest()
+  if filereadable("Vagrantfile")
+    let extra_cmd = "vagrant "
+  else
+    let extra_cmd = ""
+  endif
+
   let in_test_file = match(expand("%"), '\(.feature\|_spec.rb\|_test.rb\)$') != -1
   if in_test_file
     call SetTestFile()
 
     if match(expand('%'), '\.feature$') != -1
-      call SetTestRunner("!cucumber")
+      call SetTestRunner("!vagrant cucumber")
       exec g:bjo_test_runner g:bjo_test_file
     elseif match(expand('%'), '_spec\.rb$') != -1
-      call SetTestRunner("!vagrant rspec")
+      call SetTestRunner("!" . extra_cmd . "rspec")
       exec g:bjo_test_runner g:bjo_test_file
     else
       call SetTestRunner("!ruby -Itest")
