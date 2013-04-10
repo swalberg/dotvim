@@ -29,7 +29,8 @@ Bundle 'tpope/vim-git'
 Bundle 'tpope/vim-haml'
 Bundle 'tpope/vim-markdown'
 Bundle 'tpope/vim-rails'
-" Bundle 'tpope/vim-vividchalk'
+Bundle 'tpope/vim-dispatch'
+Bundle 'tpope/vim-vividchalk'
 " Bundle 'tsaleh/vim-align'
 " Bundle 'tsaleh/vim-shoulda'
 " Bundle 'tsaleh/vim-supertab'
@@ -43,7 +44,8 @@ set shiftwidth=2
 set expandtab
 set autoindent
 set ruler
-:colorscheme zenburn
+":colorscheme zenburn
+:colorscheme vividchalk
 syntax on
 
 set hls is
@@ -96,7 +98,8 @@ function! RunCurrentTest()
       call SetTestRunner("!vagrant cucumber")
       exec g:bjo_test_runner g:bjo_test_file
     elseif match(expand('%'), '_spec\.rb$') != -1
-      call SetTestRunner("!" . extra_cmd . "rspec")
+      " call SetTestRunner("!" . extra_cmd . "rspec")
+      call SetTestRunner(":Dispatch " . extra_cmd . "rspec")
       exec g:bjo_test_runner g:bjo_test_file
     else
       call SetTestRunner("!ruby -Itest")
