@@ -6,6 +6,7 @@
 " see http://www.adamlowe.me/2009/12/vim-destroys-all-other-rails-editors.html
 filetype off 
 
+" Vundler ----------------------- {{{
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 
@@ -30,6 +31,7 @@ Bundle 'tpope/vim-haml'
 Bundle 'tpope/vim-markdown'
 Bundle 'tpope/vim-rails'
 Bundle 'tpope/vim-dispatch'
+Bundle 'tpope/vim-bundler'
 Bundle 'tpope/vim-vividchalk'
 " Bundle 'tsaleh/vim-align'
 " Bundle 'tsaleh/vim-shoulda'
@@ -37,6 +39,10 @@ Bundle 'tpope/vim-vividchalk'
 Bundle 'vim-ruby/vim-ruby'
 Bundle 'kana/vim-textobj-user'
 Bundle 'nelstrom/vim-textobj-rubyblock'
+
+Bundle 'itspriddle/vim-jekyll'
+
+"}}}
 
 set t_Co=256
 set tabstop=2
@@ -52,6 +58,9 @@ set hls is
 
 :set autowrite
 let mapleader = ","
+let maplocalleader = "\\"
+nnoremap <leader>ev :vsplit ~/.vim/vimrc<cr>
+nnoremap <leader>sv :source $MYVIMRC<cr>
 
 
 ab newpara <p style="font-size: 16px; padding: 0; margin: 0 0 15px 0;">
@@ -70,21 +79,23 @@ let ruby_fold = 1
 set nofoldenable        "dont fold by default
 "set foldlevel=1         "this is just what i use
 
-"cnoremap runt Rake test:recent TEST=%
-cnoremap runt !vagrant run_test %
-map <Leader>o :call RunCurrentLineInTest()<CR>
-map <Leader>t :call RunCurrentTest()<CR>
-
 " display whitespace after last character as dots
 set list listchars=tab:\ \ ,trail:·
 if has('gui_running')
   set guifont=Source\ Code\ Pro:h12
 endif
+
+" Run tests within vim ---------------------------- {{{
+"cnoremap runt Rake test:recent TEST=%
+cnoremap runt !vagrant run_test %
+map <Leader>o :call RunCurrentLineInTest()<CR>
+map <Leader>t :call RunCurrentTest()<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Test-running stuff
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! RunCurrentTest()
-  if filereadable("Vagrantfile")
+  if filereadable("Vagrantfile") || filereadable("../../Vagrantfile")
     let extra_cmd = "vagrant "
   else
     let extra_cmd = ""
@@ -99,7 +110,7 @@ function! RunCurrentTest()
       exec g:bjo_test_runner g:bjo_test_file
     elseif match(expand('%'), '_spec\.rb$') != -1
       " call SetTestRunner("!" . extra_cmd . "rspec")
-      call SetTestRunner(":Dispatch " . extra_cmd . "rspec")
+      call SetTestRunner(":Dispatch " . extra_cmd . "bundle exec rspec")
       exec g:bjo_test_runner g:bjo_test_file
     else
       call SetTestRunner("!ruby -Itest")
@@ -141,8 +152,9 @@ function! CorrectTestRunner()
     return "ruby"
   endif
 endfunction
+"}}}
 
-" disable arrow keys
+" Disabling bad habits ---------------------- {{{
 map <up> <nop>
 map <down> <nop>
 map <left> <nop>
@@ -151,3 +163,17 @@ imap <up> <nop>
 imap <down> <nop>
 imap <left> <nop>
 imap <right> <nop>
+" }}}
+
+" c-u UPPERCASES current word
+inoremap <c-u> <esc>viwUea
+nnoremap <c-u> viwUe
+
+" Vimscript file settings ---------------------- {{{
+augroup filetype_vim
+    autocmd!
+    autocmd FileType vim setlocal foldmethod=marker
+augroup END
+" }}}
+
+autocmd Filetype gitcommit setlocal spell textwidth=72
