@@ -36,14 +36,17 @@ Bundle 'tpope/vim-vividchalk'
 " Bundle 'tsaleh/vim-align'
 " Bundle 'tsaleh/vim-shoulda'
 " Bundle 'tsaleh/vim-supertab'
+Bundle 'godlygeek/tabular'
 Bundle 'vim-ruby/vim-ruby'
 Bundle 'kana/vim-textobj-user'
 Bundle 'nelstrom/vim-textobj-rubyblock'
-
-Bundle 'itspriddle/vim-jekyll'
+Bundle 'tpope/vim-liquid'
+Bundle 'vim-scripts/tComment'
+Bundle "wannesm/wmgraphviz.vim"
 
 "}}}
 
+set tags=/tags;
 set t_Co=256
 set tabstop=2
 set shiftwidth=2
@@ -98,7 +101,7 @@ function! RunCurrentTest()
   if filereadable("Vagrantfile") || filereadable("../../Vagrantfile")
     let extra_cmd = "vagrant "
   else
-    let extra_cmd = ""
+    let extra_cmd = "bundle exec "
   endif
 
   let in_test_file = match(expand("%"), '\(.feature\|_spec.rb\|_test.rb\)$') != -1
@@ -110,7 +113,7 @@ function! RunCurrentTest()
       exec g:bjo_test_runner g:bjo_test_file
     elseif match(expand('%'), '_spec\.rb$') != -1
       " call SetTestRunner("!" . extra_cmd . "rspec")
-      call SetTestRunner(":Dispatch " . extra_cmd . "bundle exec rspec")
+      call SetTestRunner(":Dispatch " . extra_cmd . "rspec")
       exec g:bjo_test_runner g:bjo_test_file
     else
       call SetTestRunner("!ruby -Itest")
@@ -166,9 +169,9 @@ imap <right> <nop>
 " }}}
 
 " c-u UPPERCASES current word
-inoremap <c-u> <esc>viwUea
-nnoremap <c-u> viwUe
-
+"inoremap <c-u> <esc>viwUea
+"nnoremap <c-u> viwUe
+"nnoremap <c-p> df(f)cl.to_date<esc>2F"
 " Vimscript file settings ---------------------- {{{
 augroup filetype_vim
     autocmd!
@@ -177,3 +180,9 @@ augroup END
 " }}}
 
 autocmd Filetype gitcommit setlocal spell textwidth=72
+
+autocmd Filetype ruby set number
+autocmd Filetype python set shiftwidth=4
+autocmd Filetype python set number
+let ruby_no_identifiers = 1
+let ruby_no_expensive = 1
