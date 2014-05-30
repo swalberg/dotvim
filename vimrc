@@ -33,9 +33,6 @@ Bundle 'tpope/vim-rails'
 Bundle 'tpope/vim-dispatch'
 Bundle 'tpope/vim-bundler'
 Bundle 'tpope/vim-vividchalk'
-" Bundle 'tsaleh/vim-align'
-" Bundle 'tsaleh/vim-shoulda'
-" Bundle 'tsaleh/vim-supertab'
 Bundle 'godlygeek/tabular'
 Bundle 'vim-ruby/vim-ruby'
 Bundle 'kana/vim-textobj-user'
@@ -43,7 +40,22 @@ Bundle 'nelstrom/vim-textobj-rubyblock'
 Bundle 'tpope/vim-liquid'
 Bundle 'vim-scripts/tComment'
 Bundle "wannesm/wmgraphviz.vim"
+Bundle "stefanoverna/vim-i18n"
+Bundle 'kchmck/vim-coffee-script'
+Bundle 'mileszs/ack.vim'
+Bundle 'groenewege/vim-less'
+Bundle 'thoughtbot/vim-rspec'
+Bundle 'swalberg/developerworks-vim'
+Bundle 'kien/ctrlp.vim'
+Bundle 'skammer/vim-css-color'
+Bundle 'cakebaker/scss-syntax.vim'
 
+filetype plugin on
+Bundle "MarcWeber/vim-addon-mw-utils"
+Bundle "tomtom/tlib_vim"
+Bundle "garbas/vim-snipmate"
+
+Bundle "honza/vim-snippets"
 "}}}
 
 set tags=/tags;
@@ -90,60 +102,20 @@ endif
 
 " Run tests within vim ---------------------------- {{{
 "cnoremap runt Rake test:recent TEST=%
-cnoremap runt !vagrant run_test %
-map <Leader>o :call RunCurrentLineInTest()<CR>
-map <Leader>t :call RunCurrentTest()<CR>
+map <Leader>t :call RunCurrentSpecFile()<CR>
+map <Leader>s :call RunNearestSpec()<CR>
+map <Leader>l :call RunLastSpec()<CR>
+map <Leader>a :call RunAllSpecs()<CR>
+if filereadable('../../Vagrantfile')
+  let g:rspec_command = "Dispatch vagrant rspec {spec}"
+else
+  let g:rspec_command = "Dispatch bin/rspec {spec}"
+endif
+let g:rspec_command_launcher = "iterm"
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Test-running stuff
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! RunCurrentTest()
-  if filereadable("Vagrantfile") || filereadable("../../Vagrantfile")
-    let extra_cmd = "vagrant "
-  else
-    let extra_cmd = "bundle exec "
-  endif
-
-  let in_test_file = match(expand("%"), '\(.feature\|_spec.rb\|_test.rb\)$') != -1
-  if in_test_file
-    call SetTestFile()
-
-    if match(expand('%'), '\.feature$') != -1
-      call SetTestRunner("!vagrant cucumber")
-      exec g:bjo_test_runner g:bjo_test_file
-    elseif match(expand('%'), '_spec\.rb$') != -1
-      " call SetTestRunner("!" . extra_cmd . "rspec")
-      call SetTestRunner(":Dispatch " . extra_cmd . "rspec")
-      exec g:bjo_test_runner g:bjo_test_file
-    else
-      call SetTestRunner("!ruby -Itest")
-      exec g:bjo_test_runner g:bjo_test_file
-    endif
-  else
-    exec g:bjo_test_runner g:bjo_test_file
-  endif
-endfunction
-
-function! SetTestRunner(runner)
-  let g:bjo_test_runner=a:runner
-endfunction
-
-function! RunCurrentLineInTest()
-  let in_test_file = match(expand("%"), '\(.feature\|_spec.rb\|_test.rb\)$') != -1
-  if in_test_file
-    call SetTestFileWithLine()
-  end
-
-  exec "!vagrant rspec" g:bjo_test_file . ":" . g:bjo_test_file_line
-endfunction
-
-function! SetTestFile()
-  let g:bjo_test_file=@%
-endfunction
-
-function! SetTestFileWithLine()
-  let g:bjo_test_file=@%
-  let g:bjo_test_file_line=line(".")
+" Overwriting the one from vim-rspec
+function! InSpecFile()
+  return match(expand("%"), "_spec.rb$") != -1 || match(expand("%"), "_feature.rb$") != -1
 endfunction
 
 function! CorrectTestRunner()
@@ -156,6 +128,8 @@ function! CorrectTestRunner()
   endif
 endfunction
 "}}}
+
+vmap <Leader>z :call I18nTranslateString()<CR>
 
 " Disabling bad habits ---------------------- {{{
 map <up> <nop>
@@ -179,6 +153,7 @@ augroup filetype_vim
 augroup END
 " }}}
 
+autocmd Filetype markdown setlocal spell wrap linebreak nolist
 autocmd Filetype gitcommit setlocal spell textwidth=72
 
 autocmd Filetype ruby set number
@@ -186,3 +161,8 @@ autocmd Filetype python set shiftwidth=4
 autocmd Filetype python set number
 let ruby_no_identifiers = 1
 let ruby_no_expensive = 1
+
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+
+autocmd FileType sass,scss,stylus syn cluster sassCssAttributes add=@cssColors
